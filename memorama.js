@@ -36,59 +36,59 @@ const random_table = async () => {
   };
 };
 
-function addAnimationRotateCard(card){
+function addAnimationRotateCard(card, option) {
+  let optionRotate = option
+    ? [{ transform: "rotateY(0deg)" }, { transform: "rotateY(180deg)" }]
+    : [{ transform: "rotateY(180deg)" }, { transform: "rotateY(0deg)" }];
 
-  let rotateCardKeyFrame = new KeyframeEffect(
-    card,
-    [
-      {transform:'rotateY(0deg)'},
-      {transform:'rotateY(180deg)'}
-    ],
-    {duration:3000,fill:'forwards'}
-  )
-  let rotateCardAnimation=new Animation(rotateCardKeyFrame, document.timeline)
-
+  let rotateCardKeyFrame = new KeyframeEffect(card, optionRotate, {
+    duration: 1000,
+    fill: "forwards",
+  });
+  let rotateCardAnimation = new Animation(
+    rotateCardKeyFrame,
+    document.timeline
+  );
+  rotateCardAnimation.play();
 }
+
+function addAnimationDisappearImageCard(image, option) {
+  let optionDisappear = option
+    ? [{ opacity: 1 }, { opacity: 0 }]
+    : [{ opacity: 0 }, { opacity: 1 }];
+
+  let disappearImageCardKeyFrame = new KeyframeEffect(image, optionDisappear, {
+    delay:(option?0:500),
+    duration: 500,
+    fill: "forwards",
+  });
+  let disappearImageCardAnimation = new Animation(
+    disappearImageCardKeyFrame,
+    document.timeline
+  );
+  disappearImageCardAnimation.play();
+}
+
 function clickCard(card) {
-
-  if(!card.classList.contains('is-front')){
+  if (!card.classList.contains("is-front")) {
     // card.classList.remove('bg-info')
-    card.classList.add('is-front')
+    card.classList.add("is-front");
     // card.classList.add('bg-warning')
-    card.getElementsByTagName("img")[0].style.opacity=1
-
-    let rotateCardKeyFrame = new KeyframeEffect(
-      card,
-      [
-        {transform:'rotateY(0deg)'},
-        {transform:'rotateY(180deg)'}
-      ],
-      {duration:3000,fill:'both'}
-    )
-    let rotateCardAnimation=new Animation(rotateCardKeyFrame, document.timeline)
-    rotateCardAnimation.play()
-  }else{
-    console.log('click but I already was clicked')
-    card.classList.remove('is-front')
-    let rotateCardKeyFrame = new KeyframeEffect(
-      card,
-      [
-        {transform:'rotateY(180deg)'},
-        {transform:'rotateY(0deg)'}
-      ],
-      {duration:3000,fill:'both'}
-    )
-    let rotateCardAnimation=new Animation(rotateCardKeyFrame, document.timeline)
-    rotateCardAnimation.play()
+    card.getElementsByTagName("img")[0].style.opacity = 1;
+    addAnimationRotateCard(card, true);
+    addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], true);
+  } else {
+    console.log("click but I already was clicked");
+    card.classList.remove("is-front");
+    addAnimationRotateCard(card, false);
+    addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], false);
   }
-
-
 }
 const eventCard = () => {
   document.querySelectorAll('[id^="card"]').forEach((card) => {
-    addAnimationRotateCard(card)
-    card.addEventListener("click", ()=>{
-      clickCard(card)
+    addAnimationRotateCard(card);
+    card.addEventListener("click", () => {
+      clickCard(card);
     });
   });
 };
