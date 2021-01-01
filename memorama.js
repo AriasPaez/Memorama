@@ -38,8 +38,8 @@ const random_table = async () => {
 
 function addAnimationRotateCard(card, option) {
   let optionRotate = option
-    ? [{ transform: "rotateY(0deg)" }, { transform: "rotateY(180deg)" }]
-    : [{ transform: "rotateY(180deg)" }, { transform: "rotateY(0deg)" }];
+    ? [{ transform: "rotateY(180deg)" }, { transform: "rotateY(0deg)" }]
+    : [{ transform: "rotateY(0deg)" }, { transform: "rotateY(180deg)" }];
 
   let rotateCardKeyFrame = new KeyframeEffect(card, optionRotate, {
     duration: 1000,
@@ -54,11 +54,11 @@ function addAnimationRotateCard(card, option) {
 
 function addAnimationDisappearImageCard(image, option) {
   let optionDisappear = option
-    ? [{ opacity: 1 }, { opacity: 0 }]
-    : [{ opacity: 0 }, { opacity: 1 }];
+    ? [{ opacity: 0 }, { opacity: 1 }]
+    : [{ opacity: 1 }, { opacity: 0 }];
 
   let disappearImageCardKeyFrame = new KeyframeEffect(image, optionDisappear, {
-    delay:(option?0:500),
+    delay:(option?500:0),
     duration: 500,
     fill: "forwards",
   });
@@ -68,17 +68,51 @@ function addAnimationDisappearImageCard(image, option) {
   );
   disappearImageCardAnimation.play();
 }
-
+function getCardsInFaceButNotPair(){
+  let allCardsNotPaired = document.querySelectorAll('[id^="card"][class*="is-front"]:not([class*="paired"])')
+  return allCardsNotPaired
+}
+function thereAreTwoCardInFaceButNotPair(){
+  let allCardsNotPaired = document.querySelectorAll('[id^="card"][class*="is-front"]:not([class*="paired"])')
+  return (allCardsNotPaired.length==2?true:false)
+}
 function clickCard(card) {
+
   if (!card.classList.contains("is-front")) {
     // card.classList.remove('bg-info')
     card.classList.add("is-front");
     // card.classList.add('bg-warning')
-    card.getElementsByTagName("img")[0].style.opacity = 1;
+    addAnimationRotateCard(card, true);
+    addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], true);
+
+    if(thereAreTwoCardInFaceButNotPair()){
+      let cardsNotPair = getCardsInFaceButNotPair()
+      console.log(cardsNotPair.length)
+      let imgOne = cardsNotPair[0].getElementsByTagName('img')[0]
+      let imgTwo = cardsNotPair[1].getElementsByTagName('img')[0]
+      
+      console.log(imgOne)
+      console.log(imgTwo)
+      if((imgOne.getAttribute('src'))==(imgTwo.getAttribute('src'))){
+        console.log('YES')
+      }else{
+        console.log('NOP')
+      }
+    }
+  } else {
+    card.classList.remove("is-front");
+    addAnimationRotateCard(card, false);
+    addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], false);
+  }
+}
+function clickCardWithoutLogic(card) {
+  if (!card.classList.contains("is-front")) {
+    // card.classList.remove('bg-info')
+    card.classList.add("is-front");
+    // card.classList.add('bg-warning')
     addAnimationRotateCard(card, true);
     addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], true);
   } else {
-    console.log("click but I already was clicked");
     card.classList.remove("is-front");
     addAnimationRotateCard(card, false);
     addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], false);
@@ -86,7 +120,7 @@ function clickCard(card) {
 }
 const eventCard = () => {
   document.querySelectorAll('[id^="card"]').forEach((card) => {
-    addAnimationRotateCard(card);
+    
     card.addEventListener("click", () => {
       clickCard(card);
     });
@@ -108,7 +142,22 @@ const fill_game = async () => {
     fragment.appendChild(clone);
   }
   memorama.replaceChildren(fragment);
-  eventCard();
+  
+  setTimeout(()=>{
+    let allCards = document.querySelectorAll('[id^="card"]')
+    allCards.forEach((card)=>{
+      clickCardWithoutLogic(card)      
+    })
+  },1500)
+  setTimeout(()=>{
+    let allCards = document.querySelectorAll('[id^="card"]')
+    allCards.forEach((card)=>{
+      clickCardWithoutLogic(card)      
+    })
+    eventCard();
+  },3000)
+
+  
 };
 // const fill_game = async () => {
 //   let { matriz, len_matriz_rows, len_matriz_columns } = await random_table();
