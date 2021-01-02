@@ -110,6 +110,9 @@ function clickCard(event) {
           cardTwo.dispatchEvent(new Event("click"));
         }, 2000);
       }
+      let elementPlayerMoves = document.getElementById("playerMoves");
+      let valuePlayerMoves = elementPlayerMoves.textContent;
+      elementPlayerMoves.textContent = parseInt(valuePlayerMoves) + 1;
     }
   } else {
     card.classList.remove("is-front");
