@@ -58,7 +58,7 @@ function addAnimationDisappearImageCard(image, option) {
     : [{ opacity: 1 }, { opacity: 0 }];
 
   let disappearImageCardKeyFrame = new KeyframeEffect(image, optionDisappear, {
-    delay:(option?500:0),
+    delay: option ? 500 : 0,
     duration: 500,
     fill: "forwards",
   });
@@ -68,15 +68,21 @@ function addAnimationDisappearImageCard(image, option) {
   );
   disappearImageCardAnimation.play();
 }
-function getCardsInFaceButNotPair(){
-  let allCardsNotPaired = document.querySelectorAll('[id^="card"][class*="is-front"]:not([class*="paired"])')
-  return allCardsNotPaired
+function getCardsInFaceButNotPair() {
+  let allCardsNotPaired = document.querySelectorAll(
+    '[id^="card"][class*="is-front"]:not([class*="paired"])'
+  );
+  return allCardsNotPaired;
 }
-function thereAreTwoCardInFaceButNotPair(){
-  let allCardsNotPaired = document.querySelectorAll('[id^="card"][class*="is-front"]:not([class*="paired"])')
-  return (allCardsNotPaired.length==2?true:false)
+function thereAreTwoCardInFaceButNotPair() {
+  let allCardsNotPaired = document.querySelectorAll(
+    '[id^="card"][class*="is-front"]:not([class*="paired"])'
+  );
+  return allCardsNotPaired.length == 2 ? true : false;
 }
-function clickCard(card) {
+function clickCard(event) {
+  let card =
+    event.target.tagName == "DIV" ? event.target : event.target.offsetParent;
 
   if (!card.classList.contains("is-front")) {
     // card.classList.remove('bg-info')
@@ -85,18 +91,24 @@ function clickCard(card) {
     addAnimationRotateCard(card, true);
     addAnimationDisappearImageCard(card.getElementsByTagName("img")[0], true);
 
-    if(thereAreTwoCardInFaceButNotPair()){
-      let cardsNotPair = getCardsInFaceButNotPair()
-      console.log(cardsNotPair.length)
-      let imgOne = cardsNotPair[0].getElementsByTagName('img')[0]
-      let imgTwo = cardsNotPair[1].getElementsByTagName('img')[0]
-      
-      console.log(imgOne)
-      console.log(imgTwo)
-      if((imgOne.getAttribute('src'))==(imgTwo.getAttribute('src'))){
-        console.log('YES')
-      }else{
-        console.log('NOP')
+    if (thereAreTwoCardInFaceButNotPair()) {
+      let cardsNotPair = getCardsInFaceButNotPair();
+      let cardOne = cardsNotPair[0];
+      let cardTwo = cardsNotPair[1];
+      let imgOne = cardOne.getElementsByTagName("img")[0];
+      let imgTwo = cardTwo.getElementsByTagName("img")[0];
+
+      if (imgOne.getAttribute("src") == imgTwo.getAttribute("src")) {
+        cardOne.classList.add("paired");
+        cardTwo.classList.add("paired");
+
+        cardOne.removeEventListener("click", clickCard);
+        cardTwo.removeEventListener("click", clickCard);
+      } else {
+        setTimeout(() => {
+          cardOne.dispatchEvent(new Event("click"));
+          cardTwo.dispatchEvent(new Event("click"));
+        }, 2000);
       }
     }
   } else {
@@ -120,10 +132,8 @@ function clickCardWithoutLogic(card) {
 }
 const eventCard = () => {
   document.querySelectorAll('[id^="card"]').forEach((card) => {
-    
-    card.addEventListener("click", () => {
-      clickCard(card);
-    });
+    // console.log(card)
+    card.addEventListener("click", clickCard);
   });
 };
 const fill_game = async () => {
@@ -142,22 +152,20 @@ const fill_game = async () => {
     fragment.appendChild(clone);
   }
   memorama.replaceChildren(fragment);
-  
-  setTimeout(()=>{
-    let allCards = document.querySelectorAll('[id^="card"]')
-    allCards.forEach((card)=>{
-      clickCardWithoutLogic(card)      
-    })
-  },1500)
-  setTimeout(()=>{
-    let allCards = document.querySelectorAll('[id^="card"]')
-    allCards.forEach((card)=>{
-      clickCardWithoutLogic(card)      
-    })
-    eventCard();
-  },3000)
 
-  
+  setTimeout(() => {
+    let allCards = document.querySelectorAll('[id^="card"]');
+    allCards.forEach((card) => {
+      clickCardWithoutLogic(card);
+    });
+  }, 1500);
+  setTimeout(() => {
+    let allCards = document.querySelectorAll('[id^="card"]');
+    allCards.forEach((card) => {
+      clickCardWithoutLogic(card);
+    });
+    eventCard();
+  }, 3000);
 };
 // const fill_game = async () => {
 //   let { matriz, len_matriz_rows, len_matriz_columns } = await random_table();
